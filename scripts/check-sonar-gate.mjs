@@ -14,11 +14,16 @@ import { fileURLToPath } from 'node:url'
 
 const MIN_COVERAGE = 80
 const MAX_DUPLICATION = 3
+/** The one host the token is ever sent to, whatever sonar-project.properties says. */
+const SONARCLOUD = 'https://sonarcloud.io'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const properties = readFileSync(join(root, 'sonar-project.properties'), 'utf8')
 const project = propertyOf('sonar.projectKey')
-const host = propertyOf('sonar.host.url')
+if (propertyOf('sonar.host.url') !== SONARCLOUD) {
+  console.error(`sonar.host.url must be ${SONARCLOUD}: the token is sent nowhere else.`)
+  process.exit(1)
+}
 const token = process.env.SONAR_TOKEN
 if (!token) {
   console.error('Set SONAR_TOKEN to a SonarQube Cloud token that can browse the project.')
@@ -79,7 +84,7 @@ function scopeOf(env) {
 }
 
 async function api(path, params) {
-  const url = new URL(`api/${path}`, `${host}/`)
+  const url = new URL(`api/${path}`, `${SONARCLOUD}/`)
   for (const [key, value] of Object.entries({ ...params, ...scope })) {
     url.searchParams.set(key, value)
   }

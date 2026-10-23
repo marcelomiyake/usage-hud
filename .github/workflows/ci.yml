@@ -13,15 +13,21 @@ jobs:
   build:
     name: Test, build and analyze
     runs-on: ubuntu-latest
-    env:
-      # Empty where GitHub withholds secrets (fork and Dependabot pull
-      # requests): the two SonarQube steps are skipped there, the rest run.
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # SonarQube Cloud needs the full history to attribute new code.
           fetch-depth: 0
+          # Nothing pushes; keep the job's GitHub token out of .git/config,
+          # where install scripts and tests could read it.
+          persist-credentials: false
+
+      # GitHub withholds secrets from fork and Dependabot pull requests: the
+      # SonarQube steps are skipped there and the rest still run. The token
+      # itself reaches only the two steps that need it, never npm ci.
+      - name: SonarQube Cloud token is available
+        id: sonar
+        run: echo "enabled=${{ secrets.SONAR_TOKEN != '' }}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -42,9 +48,13 @@ jobs:
           git diff --exit-code -- hooks
 
       - name: SonarQube Cloud analysis
-        if: env.SONAR_TOKEN != ''
+        if: steps.sonar.outputs.enabled == 'true'
         uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Zero issues on all code
-        if: env.SONAR_TOKEN != ''
+        if: steps.sonar.outputs.enabled == 'true'
         run: node scripts/check-sonar-gate.mjs
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

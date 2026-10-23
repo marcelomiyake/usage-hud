@@ -67,6 +67,24 @@ describe('when the engine measures the session', () => {
   })
 })
 
+describe('with figures no real engine would send', () => {
+  it('draws only its own icons, digits and units, never text it was handed', async () => {
+    await engine.dispatch('session.measure', {
+      context: { window: Number.NaN, tokens: -5 },
+      rateLimits: [
+        { kind: '\u001b]8;;https://example.com\u0007five_hour', percentUsed: 50 },
+        { kind: 'five_hour', percentUsed: Number.POSITIVE_INFINITY },
+        { kind: 'seven_day', percentUsed: 12, resetsAt: '\u001b[2J<script>' },
+        { kind: 'seven_day', percentUsed: 7, resetsAt: IN_THREE_HOURS },
+      ],
+      changed: ['context', 'rateLimits'],
+    })
+
+    expect(engine.lastStatus).toBe('📅 7% ↻3h')
+    expect(engine.statuses.join('')).toMatch(/^[🪟🕔📅🎁↻—<\d.kMdhm/% ]*$/u)
+  })
+})
+
 describe('between turns', () => {
   it('counts down to each reset, then drops the window to 0%', async () => {
     engine.usage = {
