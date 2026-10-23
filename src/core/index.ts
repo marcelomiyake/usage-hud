@@ -1,4 +1,9 @@
 // The core's public surface: what an adapter for any tool builds on.
+export type { Clock } from './application/ports/clock'
+export type { StatusDisplay } from './application/ports/status-display'
+export type { UsageSource } from './application/ports/usage-source'
+export { ShowUsage, type ShowUsageOutcome, type ShowUsagePorts } from './application/show-usage'
+export { snapshotOf, type LimitReading, type UsageReading } from './application/usage-reading'
 export { ContextWindow } from './domain/context-window'
 export { ResetOffer } from './domain/reset-offer'
 export { ICONS, StatusLine, type StatusSegment, type StatusSegmentKind } from './domain/status-line'
