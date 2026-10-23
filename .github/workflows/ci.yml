@@ -13,6 +13,10 @@ jobs:
   build:
     name: Test, build and analyze
     runs-on: ubuntu-latest
+    env:
+      # Empty where GitHub withholds secrets (fork and Dependabot pull
+      # requests): the two SonarQube steps are skipped there, the rest run.
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -38,11 +42,9 @@ jobs:
           git diff --exit-code -- hooks
 
       - name: SonarQube Cloud analysis
+        if: env.SONAR_TOKEN != ''
         uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8.3.0
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Zero issues on all code
+        if: env.SONAR_TOKEN != ''
         run: node scripts/check-sonar-gate.mjs
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
