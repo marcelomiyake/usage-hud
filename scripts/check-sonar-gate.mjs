@@ -101,6 +101,6 @@ function countOf(value) {
 
 function measureOf(response, metric) {
   const found = response.component.measures.find(measure => measure.metric === metric)
-  const value = found?.value ?? found?.period?.value
+  const value = found?.value ?? found?.periods?.[0]?.value ?? found?.period?.value
   return value === undefined ? undefined : Number(value)
 }
