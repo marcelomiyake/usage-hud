@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2023", "dom"],
+    "types": ["node"],
+    "noUnusedLocals": false
+  },
+  "include": ["src", "tests", "types/claude-code", "vitest.config.ts"]
+}
