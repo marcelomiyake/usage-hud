@@ -17,7 +17,7 @@ export function register(on: On): void {
   })
 
   on('session.measure', async ($, e, next) => {
-    await showUsage($, { read: async () => readingOf(e) })
+    await showUsage($, { read: () => Promise.resolve(readingOf(e)) })
     return next(e)
   })
 }
