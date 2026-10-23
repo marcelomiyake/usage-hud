@@ -1,0 +1,12 @@
+{
+  "name": "usage-hud",
+  "description": "The usage-hud mod: context window, 5-hour and weekly usage in the Claude Code status line.",
+  "owner": { "name": "Marcelo Masahiko Miyake" },
+  "plugins": [
+    {
+      "name": "usage-hud",
+      "source": "./",
+      "description": "Context window, 5-hour and weekly usage as icons in the Claude Code status line."
+    }
+  ]
+}
