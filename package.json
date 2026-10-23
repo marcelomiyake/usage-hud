@@ -1,0 +1,50 @@
+{
+  "name": "usage-hud",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Context window, 5-hour and weekly usage at a glance in the Claude Code status line, as a Claude Code mod.",
+  "keywords": [
+    "claude-code",
+    "claude-code-plugin",
+    "claude-code-mod",
+    "status-line",
+    "statusline",
+    "usage",
+    "rate-limit",
+    "context-window",
+    "anthropic",
+    "claude"
+  ],
+  "homepage": "https://github.com/marcelomiyake/usage-hud#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcelomiyake/usage-hud.git"
+  },
+  "license": "MIT",
+  "author": "Marcelo Masahiko Miyake",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build-claude-code-plugin.mjs",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:plugin": "claude plugin test .",
+    "validate:plugin": "claude plugin validate .",
+    "types:sync": "node scripts/sync-claude-code-types.mjs",
+    "verify": "npm run format:check && npm run typecheck && npm run test:coverage && npm run build && npm run validate:plugin && npm run test:plugin",
+    "sonar": "vitest run --coverage && sonar-scanner",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "@vitest/coverage-v8": "^5.0.5",
+    "esbuild": "^0.28.2",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
+  }
+}
