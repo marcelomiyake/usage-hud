@@ -29,3 +29,5 @@ types/claude-code/
 .scannerwork/
 # Claude Code per-user settings
 .claude/settings.local.json
+# The animation vhs docs/statusline.tape records beside the screenshot
+docs/statusline.gif

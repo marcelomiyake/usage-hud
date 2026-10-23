@@ -62,6 +62,7 @@ The API's type declarations are generated per Claude Code build and are not comm
 | Run the mod's tests inside Claude Code's engine | `npm run test:plugin`                                      |
 | Everything above, in order                      | `npm run verify`                                           |
 | SonarQube Cloud analysis                        | `SONAR_TOKEN=… npm run sonar`                              |
+| Re-capture the README screenshot (needs VHS)    | `vhs docs/statusline.tape`                                 |
 | Check the zero-issues gate                      | `SONAR_TOKEN=… node scripts/check-sonar-gate.mjs`          |
 
 Tests come in two kinds:
