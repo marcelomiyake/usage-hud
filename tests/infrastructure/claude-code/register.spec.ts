@@ -62,19 +62,23 @@ describe('when the engine measures the session', () => {
       changed: ['context', 'rateLimits'],
     })
 
-    expect(engine.lastStatus).toBe('🪟 45.2k/1M  🕔 23%  📅 41%')
+    expect(engine.lastStatus).toBe('🪟 45.2k/1M  🕔 23% ↻3h  📅 41%')
     expect(measured).toMatchObject({ changed: ['context', 'rateLimits'] })
   })
 })
 
 describe('between turns', () => {
-  it('drops a window to 0% once it resets', async () => {
+  it('counts down to each reset, then drops the window to 0%', async () => {
     engine.usage = {
       context: { window: 200_000, tokens: 64_000 },
       rateLimits: [{ kind: 'five_hour', percentUsed: 97, resetsAt: IN_THREE_HOURS }],
     }
     await engine.dispatch('session.start', { source: 'startup' })
-    expect(engine.lastStatus).toBe('🪟 64k/200k  🕔 97%')
+    expect(engine.lastStatus).toBe('🪟 64k/200k  🕔 97% ↻3h')
+
+    engine.now = new Date(2026, 9, 23, 14, 15).getTime()
+    await engine.tick()
+    expect(engine.lastStatus).toBe('🪟 64k/200k  🕔 97% ↻45m')
 
     engine.now = new Date(2026, 9, 23, 15, 1).getTime()
     await engine.tick()

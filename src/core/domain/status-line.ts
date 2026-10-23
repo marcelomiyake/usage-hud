@@ -19,6 +19,9 @@ export type StatusSegment = {
   readonly value: string
 }
 
+/** Marks the time left until a window resets, after its percentage: `23% ↻2h13m`. */
+export const RESETS_IN = '↻'
+
 const SEPARATOR = '  '
 /** Stands for the context fill before the model has answered in the window. */
 const UNKNOWN = '—'
@@ -26,7 +29,8 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 
 /**
  * The usage figures as the status line shows them, in a fixed order:
- * context window, 5-hour window, weekly window, then a reset offer.
+ * context window, 5-hour window, weekly window, then a reset offer. Each
+ * window shows its share used and, when known, the time until it resets.
  * A figure the snapshot lacks is left out, never shown as zero.
  */
 export class StatusLine {
@@ -61,7 +65,9 @@ function contextValue(context: ContextWindow): string {
 }
 
 function percentValue(limit: UsageLimit, now: Date): string {
-  return `${limit.wholePercentAt(now)}%`
+  const percent = `${limit.wholePercentAt(now)}%`
+  const countdown = limit.countdownAt(now)
+  return countdown === undefined ? percent : `${percent} ${RESETS_IN}${countdown.format()}`
 }
 
 /** `Oct 30`, in the local time zone. */

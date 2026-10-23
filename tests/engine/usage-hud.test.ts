@@ -31,10 +31,10 @@ async function boot($: Engine, on: On, usage: SessionUsage): Promise<{ readonly 
 }
 
 describe('the status line', () => {
-  test('shows the context window, 5-hour and weekly usage as icons', async ($, on) => {
+  test('shows the context window, 5-hour and weekly usage as icons, with the time to each reset', async ($, on) => {
     const { lines } = await boot($, on, USAGE)
 
-    expect(lines.at(-1)).toBe('🪟 45.2k/1M  🕔 23%  📅 41%')
+    expect(lines.at(-1)).toBe('🪟 45.2k/1M  🕔 23% ↻3h  📅 41% ↻4d21h')
   })
 
   test('shows only the window size off a subscription, before the first response', async ($, on) => {
@@ -55,6 +55,6 @@ describe('the status line', () => {
       changed: ['context', 'rateLimits'],
     })
 
-    expect(lines.at(-1)).toBe('🪟 120k/1M  🕔 31%  📅 42%')
+    expect(lines.at(-1)).toBe('🪟 120k/1M  🕔 31% ↻3h  📅 42%')
   })
 })
