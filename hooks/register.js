@@ -7,6 +7,7 @@ var ICONS = {
   weekly: "📅",
   reset: "🎁"
 };
+var RESETS_IN = "↻";
 var SEPARATOR = "  ";
 var UNKNOWN = "—";
 var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -38,7 +39,9 @@ function contextValue(context) {
   return `${context.used?.format() ?? UNKNOWN}/${context.size.format()}`;
 }
 function percentValue(limit, now) {
-  return `${limit.wholePercentAt(now)}%`;
+  const percent = `${limit.wholePercentAt(now)}%`;
+  const countdown = limit.countdownAt(now);
+  return countdown === void 0 ? percent : `${percent} ${RESETS_IN}${countdown.format()}`;
 }
 function monthDay(date) {
   return `${MONTHS[date.getMonth()]} ${date.getDate()}`;
@@ -115,6 +118,44 @@ var ResetOffer = class _ResetOffer {
   }
 };
 
+// src/core/domain/countdown.ts
+var MINUTE = 6e4;
+var HOUR = 60 * MINUTE;
+var DAY = 24 * HOUR;
+var Countdown = class _Countdown {
+  constructor(ms) {
+    this.ms = ms;
+  }
+  ms;
+  /** The time from `now` until `then`; undefined once `then` has come. */
+  static until(then, now) {
+    const ms = then.getTime() - now.getTime();
+    return ms > 0 ? new _Countdown(ms) : void 0;
+  }
+  /**
+   * The two largest units left, the smaller dropped when it is zero:
+   * `4d21h`, `4d`, `2h13m`, `2h`, `45m`, and `<1m` for the last minute.
+   */
+  format() {
+    if (this.ms < MINUTE) {
+      return "<1m";
+    }
+    const days = Math.floor(this.ms / DAY);
+    const hours = Math.floor(this.ms % DAY / HOUR);
+    const minutes = Math.floor(this.ms % HOUR / MINUTE);
+    if (days > 0) {
+      return pair(days, "d", hours, "h");
+    }
+    if (hours > 0) {
+      return pair(hours, "h", minutes, "m");
+    }
+    return `${minutes}m`;
+  }
+};
+function pair(major, majorUnit, minor, minorUnit) {
+  return minor === 0 ? `${major}${majorUnit}` : `${major}${majorUnit}${minor}${minorUnit}`;
+}
+
 // src/core/domain/usage-limit.ts
 var FULL = 100;
 var UsageLimit = class _UsageLimit {
@@ -149,6 +190,10 @@ var UsageLimit = class _UsageLimit {
   wholePercentAt(now) {
     const percent = this.percentUsedAt(now);
     return percent >= FULL ? Math.round(percent) : Math.min(FULL - 1, Math.round(percent));
+  }
+  /** The time left until the window starts over; undefined when unknown or already passed. */
+  countdownAt(now) {
+    return this.resetsAt === void 0 ? void 0 : Countdown.until(this.resetsAt, now);
   }
   /** Of two readings of the same window, the one that has used more. */
   moreUsedOf(other) {

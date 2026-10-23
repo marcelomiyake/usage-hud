@@ -1,19 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import { ContextWindow } from '../../../src/core/domain/context-window'
 import { ResetOffer } from '../../../src/core/domain/reset-offer'
-import { ICONS, StatusLine } from '../../../src/core/domain/status-line'
+import { ICONS, RESETS_IN, StatusLine } from '../../../src/core/domain/status-line'
 import { UsageLimit } from '../../../src/core/domain/usage-limit'
 import { UsageSnapshot } from '../../../src/core/domain/usage-snapshot'
 
 /** Local dates, so the month and day read the same in every time zone. */
 const NOW = new Date(2026, 9, 23, 12, 0)
 const IN_THREE_HOURS = new Date(2026, 9, 23, 15, 0)
+/** By the clock, not the calendar, so a daylight-saving change on the way moves nothing. */
+const IN_FOUR_DAYS = new Date(NOW.getTime() + ((4 * 24 + 9) * 60 + 13) * 60_000)
 const TWO_HOURS_AGO = new Date(2026, 9, 23, 10, 0)
 const NEXT_WEEK = new Date(2026, 9, 30, 9, 0)
 
 const CONTEXT = ContextWindow.of({ size: 1_000_000, used: 45_213 })
 const SESSION = UsageLimit.of({ period: 'session', percentUsed: 23.4, resetsAt: IN_THREE_HOURS })
-const WEEKLY = UsageLimit.of({ period: 'weekly', percentUsed: 41 })
+const WEEKLY = UsageLimit.of({ period: 'weekly', percentUsed: 41, resetsAt: IN_FOUR_DAYS })
 
 describe('StatusLine', () => {
   it('shows every figure behind its icon, in order', () => {
@@ -25,12 +27,19 @@ describe('StatusLine', () => {
 
     const line = StatusLine.of(snapshot, NOW)
 
-    expect(line.text).toBe('🪟 45.2k/1M  🕔 23%  📅 41%  🎁 Oct 30')
+    expect(line.text).toBe('🪟 45.2k/1M  🕔 23% ↻3h  📅 41% ↻4d9h  🎁 Oct 30')
     expect(line.segments.map(segment => segment.kind)).toEqual(['context', 'session', 'weekly', 'reset'])
   })
 
   it('names each figure by an icon alone', () => {
     expect(ICONS).toEqual({ context: '🪟', session: '🕔', weekly: '📅', reset: '🎁' })
+    expect(RESETS_IN).toBe('↻')
+  })
+
+  it('shows a window without its countdown when the reset time is unknown', () => {
+    const weekly = UsageLimit.of({ period: 'weekly', percentUsed: 41 })
+
+    expect(StatusLine.of(UsageSnapshot.of({ limits: [weekly] }), NOW).text).toBe('📅 41%')
   })
 
   it('shows the window size with an unknown fill before the first answer', () => {
@@ -52,7 +61,7 @@ describe('StatusLine', () => {
   it('shows the gift only while a reset is open', () => {
     const snapshot = UsageSnapshot.of({ limits: [WEEKLY], resetOffers: [ResetOffer.of(TWO_HOURS_AGO)] })
 
-    expect(StatusLine.of(snapshot, NOW).text).toBe('📅 41%')
+    expect(StatusLine.of(snapshot, NOW).text).toBe('📅 41% ↻4d9h')
   })
 
   it('is empty when nothing is known', () => {

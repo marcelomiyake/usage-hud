@@ -1,3 +1,5 @@
+import { Countdown } from './countdown'
+
 /** Which rolling window a usage limit counts over. */
 export type UsagePeriod = 'session' | 'weekly'
 
@@ -41,6 +43,11 @@ export class UsageLimit {
   wholePercentAt(now: Date): number {
     const percent = this.percentUsedAt(now)
     return percent >= FULL ? Math.round(percent) : Math.min(FULL - 1, Math.round(percent))
+  }
+
+  /** The time left until the window starts over; undefined when unknown or already passed. */
+  countdownAt(now: Date): Countdown | undefined {
+    return this.resetsAt === undefined ? undefined : Countdown.until(this.resetsAt, now)
   }
 
   /** Of two readings of the same window, the one that has used more. */

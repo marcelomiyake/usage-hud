@@ -4,7 +4,7 @@ Instructions for AI coding agents (Claude Code, Codex, and others) working in th
 
 ## What this project is
 
-usage-hud shows how much of your Claude usage you have left, at a glance, in the Claude Code status line. The line has icons and no words: `🪟 45.2k/1M  🕔 23%  📅 41%`. That is the context window's fill over its size, the 5-hour session window, and the weekly window. A `🎁 Oct 30` with the expiry date is added when a usage-limit reset is known to be available.
+usage-hud shows how much of your Claude usage you have left, at a glance, in the Claude Code status line. The line has icons and no words: `🪟 45.2k/1M  🕔 23% ↻2h13m  📅 41% ↻4d21h`. That is the context window's fill over its size, then the 5-hour session window and the weekly window, each with the time left until it resets. A `🎁 Oct 30` with the expiry date is added when a usage-limit reset is known to be available.
 
 Claude Code is the first tool it supports, as a mod (a Claude Code plugin with a hooks module). The repository root is the plugin (`.claude-plugin/plugin.json`, `hooks/`) and also its own marketplace (`.claude-plugin/marketplace.json`, with `source: "./"`). Other tools can come later, so the usage model is kept apart from every tool's API.
 
@@ -17,7 +17,7 @@ src/infrastructure/<tool>/  ──▶  src/core/application/  ──▶  src/cor
    (Claude Code mod)               (use case, ports)          (entities, value objects, rules)
 ```
 
-- `src/core/domain/`: the model. `TokenCount`, `ContextWindow`, `UsageLimit` (the `session` and `weekly` windows), `ResetOffer`, the `UsageSnapshot` aggregate, and `StatusLine`, which turns a snapshot into the icon line. It imports nothing outside `domain/`.
+- `src/core/domain/`: the model. `TokenCount`, `ContextWindow`, `UsageLimit` (the `session` and `weekly` windows), `Countdown` (the time to a window's reset), `ResetOffer`, the `UsageSnapshot` aggregate, and `StatusLine`, which turns a snapshot into the icon line. It imports nothing outside `domain/`.
 - `src/core/application/`: the `ShowUsage` use case, the `UsageReading` input (plain data that `snapshotOf` validates into a snapshot), and the ports in `ports/`: `UsageSource`, `Clock`, `StatusDisplay`. It imports only from `domain/` and `application/`.
 - `src/core/index.ts`: the core's public surface. Infrastructure imports from here, never from deeper files.
 - `src/infrastructure/claude-code/`: the Claude Code mod. `register.ts` is the composition root and the only file that touches the engine's `$`. It answers the three ports with `$.session.usage()`, `$.clock.now()` and `$.ui.status()`. `session-usage.ts` maps Claude Code's figures to a `UsageReading` and is free of `$`.
@@ -33,7 +33,7 @@ Rules that keep it that way:
 
 - Context window: `$.session.usage().context`: `tokens` (absent until the first response of the window) and `window`.
 - 5-hour and weekly windows: `.rateLimits[]` with `kind` `five_hour` and `seven_day`, `percentUsed`, and `resetsAt`. The list is empty off a subscription, so the 🕔 and 📅 icons are hidden there. Other kinds (`seven_day_opus`, a gateway's `spend_limit`) are ignored.
-- Updates: `session.measure` pushes the figures after each turn. A 60-second `$.clock.every` judges the line again, so a window whose `resetsAt` has passed reads 0%.
+- Updates: `session.measure` pushes the figures after each turn. A 60-second `$.clock.every` judges the line again, so the `↻` countdowns tick and a window whose `resetsAt` has passed reads 0%, with no countdown until the next reading.
 - Reset offers (🎁): as of Claude Code 2.1.309, a mod is told of none. The engine fetches them from claude.ai with the account's OAuth credentials and shows them only in its own `/limit-reset` notice. Do not work around that by reading credentials, calling private endpoints, running `/limit-reset` (it spends the reset), or scraping `~/.claude.json`. Wire the offer in `session-usage.ts` only once the mod API reports it.
 
 ## Claude Code mod constraints

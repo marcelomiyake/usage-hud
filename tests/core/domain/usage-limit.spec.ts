@@ -36,6 +36,15 @@ describe('UsageLimit', () => {
     expect(UsageLimit.of({ period: 'weekly', percentUsed }).wholePercentAt(NOW)).toBe(whole)
   })
 
+  it('counts down to its reset', () => {
+    expect(UsageLimit.of({ period: 'session', percentUsed: 5, resetsAt: LATER }).countdownAt(NOW)?.format()).toBe('3h')
+  })
+
+  it('has no countdown when the reset time is unknown or past', () => {
+    expect(UsageLimit.of({ period: 'weekly', percentUsed: 5 }).countdownAt(NOW)).toBeUndefined()
+    expect(UsageLimit.of({ period: 'session', percentUsed: 5, resetsAt: EARLIER }).countdownAt(NOW)).toBeUndefined()
+  })
+
   it('keeps the reading that has used more', () => {
     const low = UsageLimit.of({ period: 'weekly', percentUsed: 10 })
     const high = UsageLimit.of({ period: 'weekly', percentUsed: 30 })

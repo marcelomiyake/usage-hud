@@ -6,10 +6,10 @@
 See how much room you have left, without running `/context` or `/usage`. usage-hud is a [Claude Code](https://code.claude.com) plugin (a mod, in Claude Code's terms: a plugin with a hooks module). It pins one line of icons under the prompt:
 
 ```
-🪟 45.2k/1M  🕔 23%  📅 41%
+🪟 45.2k/1M  🕔 23% ↻2h13m  📅 41% ↻4d21h
 ```
 
-![usage-hud in a Claude Code 2.1.309 session: under the prompt, the line reads "usage-hud: 🪟 34.5k/1M 🕔 19% 📅 23%", the context window's fill over its 1M size, then the 5-hour and weekly usage.](docs/statusline.png)
+![usage-hud in a Claude Code 2.1.309 session: under the prompt, the line reads "usage-hud:" then the context window's fill over its 1M size, and the 5-hour and weekly usage with the time left until each resets.](docs/statusline.png)
 
 Claude Code draws each plugin's status entry with the plugin's name and its notice marker in front (`⚠ usage-hud:`). That framing is the engine's, and a mod cannot change it.
 
@@ -18,12 +18,13 @@ Claude Code draws each plugin's status entry with the plugin's name and its noti
 | 🪟   | The context window: tokens in use over the window's size (`200k`, `1M`). `—` before the first response.   |
 | 🕔   | The current 5-hour session window, as a percentage used. It drops to 0% once the window resets.           |
 | 📅   | This week's window, as a percentage used.                                                                 |
+| ↻    | After a window's percentage: the time left until it resets (`2h13m`, `45m`, `4d21h`).                     |
 | 🎁   | A usage-limit reset you can use, with the date it expires. Shown only when the reset is known; see below. |
 
 ## Features
 
 - **Icons, no labels.** The line stays short enough to sit beside Claude Code's own notices.
-- **Always current.** It updates after every turn, from the figures Claude Code pushes, and re-checks once a minute, so a window that has reset reads 0% without waiting for the next prompt.
+- **Always current.** It updates after every turn, from the figures Claude Code pushes, and re-checks once a minute, so the countdowns tick and a window that has reset reads 0% without waiting for the next prompt.
 - **Honest about what it doesn't know.** A figure Claude Code does not report is left out, never shown as zero. With an API key instead of a subscription there are no 5-hour or weekly windows, so only 🪟 shows.
 - **Never shows full too early.** 99.6% reads 99%, and 100% means the limit is reached.
 - **Costs nothing.** It reads figures Claude Code already holds. It makes no request and spends no tokens.

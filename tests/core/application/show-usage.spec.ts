@@ -20,7 +20,7 @@ describe('ShowUsage', () => {
     const { showUsage, shown } = harness(async () => ({
       context: { size: 200_000, used: 64_000 },
       limits: [
-        { period: 'session', percentUsed: 12 },
+        { period: 'session', percentUsed: 12, resetsAt: new Date(2026, 9, 23, 14, 30).toISOString() },
         { period: 'weekly', percentUsed: 3 },
       ],
     }))
@@ -28,7 +28,7 @@ describe('ShowUsage', () => {
     const outcome = await showUsage.execute()
 
     expect(outcome.status).toBe('shown')
-    expect(shown).toEqual(['🪟 64k/200k  🕔 12%  📅 3%'])
+    expect(shown).toEqual(['🪟 64k/200k  🕔 12% ↻2h30m  📅 3%'])
   })
 
   it('judges each window at the clock’s time', async () => {
