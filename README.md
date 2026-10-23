@@ -9,6 +9,10 @@ See how much room you have left, without running `/context` or `/usage`. usage-h
 🪟 45.2k/1M  🕔 23%  📅 41%
 ```
 
+![usage-hud in a Claude Code 2.1.309 session: under the prompt, the line reads "usage-hud: 🪟 34.5k/1M 🕔 19% 📅 23%", the context window's fill over its 1M size, then the 5-hour and weekly usage.](docs/statusline.png)
+
+Claude Code draws each plugin's status entry with the plugin's name and its notice marker in front (`⚠ usage-hud:`). That framing is the engine's, and a mod cannot change it.
+
 | Icon | What it shows                                                                                             |
 | ---- | --------------------------------------------------------------------------------------------------------- |
 | 🪟   | The context window: tokens in use over the window's size (`200k`, `1M`). `—` before the first response.   |
@@ -89,6 +93,7 @@ npm run build                  # bundle src/ into hooks/register.js
 npm run validate:plugin        # claude plugin validate
 npm run test:plugin            # claude plugin test, inside Claude Code's engine
 claude --plugin-dir .          # try it
+vhs docs/statusline.tape       # re-capture docs/statusline.png (calls the model once)
 ```
 
 ## Support
