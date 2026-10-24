@@ -1,6 +1,6 @@
 {
   "name": "usage-hud",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Context window, 5-hour and weekly usage at a glance in the Claude Code status line, as a Claude Code mod.",
   "keywords": [
