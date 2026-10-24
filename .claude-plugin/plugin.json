@@ -2,7 +2,9 @@
   "name": "usage-hud",
   "version": "0.1.0",
   "description": "Shows the context window, and the 5-hour and weekly usage with the time to each reset, in the status line as icons: 🪟 45.2k/1M  🕔 23% ↻2h13m  📅 41% ↻4d21h.",
-  "author": { "name": "Marcelo Masahiko Miyake" },
+  "author": {
+    "name": "Marcelo Masahiko Miyake"
+  },
   "homepage": "https://github.com/marcelomiyake/usage-hud",
   "repository": "https://github.com/marcelomiyake/usage-hud",
   "license": "MIT",

@@ -112,3 +112,14 @@ Every commit follows [Conventional Commits 1.0.0](https://www.conventionalcommit
 - **footers**: `Refs: #12`, `Co-Authored-By: ...`, in `token: value` form.
 
 Keep one logical change per commit and one small pull request per step. A commit that changes `src/` also includes the rebuilt `hooks/register.js`. `main` requires a pull request, and every review conversation must be resolved before it merges.
+
+## Releases: release-please
+
+`.github/workflows/release.yml` runs [release-please](https://github.com/googleapis/release-please) on every push to `main`. From the commit types merged since the last tag, it keeps one release pull request open, titled `chore: release X.Y.Z`:
+
+- `fix`, `perf` and `revert` make a patch release, `feat` a minor release, and a breaking change (`!`) a major release. The other types release nothing on their own and stay out of the changelog.
+- It sets the version in `package.json`, `package-lock.json` and `.claude-plugin/plugin.json`, and adds the release to `CHANGELOG.md`.
+- Merging it tags `vX.Y.Z` and publishes the GitHub release.
+- GitHub runs no workflow on that pull request, because the workflow's own token opened it. CI runs on `main` once it merges.
+
+Never change a version or `CHANGELOG.md` by hand. `.release-please-manifest.json` holds the last released version, and `release-please-config.json` the settings. To force a version, add a `Release-As: X.Y.Z` footer to a commit.
