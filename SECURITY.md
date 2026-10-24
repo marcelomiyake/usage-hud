@@ -6,7 +6,7 @@ usage-hud is maintained on its latest release only. Security fixes land on `main
 
 | Version        | Supported |
 | -------------- | --------- |
-| 0.1.x (latest) | Yes       |
+| Latest release | Yes       |
 | Older          | No        |
 
 ## Reporting a vulnerability
@@ -37,6 +37,7 @@ Reviewed on October 23, 2026, for usage-hud 0.1.0 on Claude Code 2.1.309. Re-run
 - **Dependencies.** No runtime dependencies: the bundle is this repository's own code, built by esbuild and not minified. `npm audit` reports 0 vulnerabilities in the development dependencies.
 - **Secrets.** A scan of the repository for key and token formats found none. The SonarQube token is not in the git history.
 - **CI.** Read `.github/workflows/ci.yml` and `scripts/check-sonar-gate.mjs` for where the token goes.
+- **Release workflow.** Added on October 24, 2026, and read then. `.github/workflows/release.yml` runs only on pushes to `main`, never on a pull request, so code from a fork cannot reach its write token. Its `contents`, `issues` and `pull-requests` write scopes are set on its one job, and the workflow's default is none. It runs `googleapis/release-please-action`, pinned to a commit, and checks out or runs none of this repository's code.
 
 ### Findings
 
@@ -60,4 +61,5 @@ Fixed during the review:
 
 - The mod relies on Claude Code's mod sandbox (no DOM, no Node, `$` as the only way out) and on its early-access API, which can change between releases.
 - `hooks/register.js` is generated code that is committed, because a marketplace install runs it as is. CI fails when it differs from a fresh build of `src/`.
+- `googleapis/release-please-action` is third-party code with write access to the repository's contents and pull requests. It is pinned to a commit, so it changes only when that pin is updated.
 - A marketplace install takes `main` as it stands. `main` accepts changes only through pull requests with every review conversation resolved.
