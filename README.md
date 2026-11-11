@@ -13,13 +13,12 @@ See how much room you have left, without running `/context` or `/usage`. usage-h
 
 Claude Code draws each plugin's status entry with the plugin's name and its notice marker in front (`⚠ usage-hud:`). That framing is the engine's, and a mod cannot change it.
 
-| Icon | What it shows                                                                                             |
-| ---- | --------------------------------------------------------------------------------------------------------- |
-| 🪟   | The context window: tokens in use over the window's size (`200k`, `1M`). `—` before the first response.   |
-| 🕔   | The current 5-hour session window, as a percentage used. It drops to 0% once the window resets.           |
-| 📅   | This week's window, as a percentage used.                                                                 |
-| ↻    | After a window's percentage: the time left until it resets (`2h13m`, `45m`, `4d21h`).                     |
-| 🎁   | A usage-limit reset you can use, with the date it expires. Shown only when the reset is known; see below. |
+| Icon | What it shows                                                                                           |
+| ---- | ------------------------------------------------------------------------------------------------------- |
+| 🪟   | The context window: tokens in use over the window's size (`200k`, `1M`). `—` before the first response. |
+| 🕔   | The current 5-hour session window, as a percentage used. It drops to 0% once the window resets.         |
+| 📅   | This week's window, as a percentage used.                                                               |
+| ↻    | After a window's percentage: the time left until it resets (`2h13m`, `45m`, `4d21h`).                   |
 
 ## Features
 
@@ -49,7 +48,6 @@ To try it from a checkout without installing: `claude --plugin-dir .`.
 
 ## Known limitations
 
-- **🎁 needs Claude Code to report resets to mods, and it does not yet.** Claude Code fetches reset offers from claude.ai with your account's credentials and shows them only in its own `/limit-reset` notice. The mod API gives a mod no reset offers. usage-hud will not read your credentials or call private endpoints to find one, so the gift stays hidden for now. The core already handles offers, so the gift shows as soon as the API reports them.
 - The context fill is unknown until the first response of the window: after start-up, `/clear` or a compaction, 🪟 reads `—/1M` until Claude answers.
 - The 5-hour and weekly figures are from the last response. Between turns, the line only knows a window has reset when its reset time passes.
 
